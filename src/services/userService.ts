@@ -1,5 +1,6 @@
 import axios from "axios";
 import { User } from "../interfaces/users/User";
+import { LoginValues } from "../interfaces/auth/auth";
 
 const API: string = import.meta.env.VITE_USERS_API;
 
@@ -9,8 +10,10 @@ export function registerUser(normalizedUser: User) {
 }
 
 // Login exist user
-export function loginUser(user: User) {
-  return axios.post(`${API}/login`, user);
+export function loginUser(credentials: LoginValues) {
+  return axios.post(`${API}/login`, credentials, {
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 // get user by id

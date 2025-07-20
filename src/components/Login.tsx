@@ -1,18 +1,17 @@
-import { FormikValues, useFormik } from "formik";
+import { FormikProps, useFormik } from "formik";
 import { FunctionComponent } from "react";
 import * as yup from "yup";
 import { loginUser } from "../services/userService";
 import { errorMessage, sucessMassage } from "../services/feedbackService";
 import { useNavigate } from "react-router-dom";
 import { useToken } from "../context/TokenContext";
+import { LoginValues } from "../interfaces/auth/auth";
 
-interface LoginProps {}
-
-const Login: FunctionComponent<LoginProps> = () => {
-  let navigate = useNavigate();
+const Login: FunctionComponent<object> = () => {
+  const navigate = useNavigate();
   const { updateToken } = useToken(); // שימוש ב-useToken
 
-  const formik: any = useFormik<FormikValues>({
+  const formik: FormikProps<LoginValues> = useFormik<LoginValues>({
     initialValues: {
       email: "",
       password: "",
