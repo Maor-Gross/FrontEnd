@@ -9,7 +9,7 @@ export function registerUser(normalizedUser: User) {
 }
 
 // Login exist user
-export function loginUser(user: any) {
+export function loginUser(user: User) {
   return axios.post(`${API}/login`, user);
 }
 

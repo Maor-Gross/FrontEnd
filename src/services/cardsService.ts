@@ -3,6 +3,7 @@ import { Card } from "../interfaces/cards/Cards";
 import { errorMessage } from "./feedbackService";
 
 const API: string = import.meta.env.VITE_CARDS_API;
+
 // get all cards
 export function getAllCards() {
   return axios.get(API).catch((error) => {
