@@ -10,7 +10,6 @@ import { Card } from "../interfaces/cards/Cards";
 const EditCard: FunctionComponent<object> = () => {
   const location = useLocation();
   const card = location.state.card as Card;
-  console.log("print from location.state", card);
   const navigate = useNavigate();
   const { token } = useToken();
 
