@@ -66,6 +66,7 @@ export async function updateCardEdited(
   token: string
 ) {
   try {
+    console.log("cardEdited:", cardEdited);
     const response = await axios.put(`${API}/${cardId}`, cardEdited, {
       headers: {
         "x-auth-token": token,
