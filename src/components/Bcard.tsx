@@ -13,6 +13,7 @@ interface BcardProps {
 }
 
 const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
+  console.log(card);
   const { user } = useUser();
   const userLoggedIn = !!user;
   const isAdmin = user && user.isAdmin;
