@@ -7,11 +7,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useToken } from "../context/TokenContext";
 import { Card } from "../interfaces/cards/Cards";
 
-interface EditCardProps {}
-
-const EditCard: FunctionComponent<EditCardProps> = () => {
+const EditCard: FunctionComponent<object> = () => {
   const location = useLocation();
   const card = location.state.card as Card;
+  console.log("print from location.state", card);
   const navigate = useNavigate();
   const { token } = useToken();
 
@@ -31,6 +30,7 @@ const EditCard: FunctionComponent<EditCardProps> = () => {
       street: card.address.street,
       houseNumber: card.address.houseNumber,
       zip: card.address.zip,
+      bizNumber: card.bizNumber,
     },
     validationSchema: yup.object({
       title: yup.string().min(2).max(256).required(),

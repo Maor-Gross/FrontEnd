@@ -7,10 +7,8 @@ import { postNewCard } from "../services/cardsService";
 import { errorMessage, sucessMassage } from "../services/feedbackService";
 import { useNavigate } from "react-router-dom";
 
-interface NewCardProps {}
-
-const NewCard: FunctionComponent<NewCardProps> = () => {
-  let navigate = useNavigate();
+const NewCard: FunctionComponent<object> = () => {
+  const navigate = useNavigate();
   const formik: FormikValues = useFormik<FormikValues>({
     initialValues: {
       title: "",
@@ -44,7 +42,7 @@ const NewCard: FunctionComponent<NewCardProps> = () => {
       zip: yup.number().required(),
     }),
     onSubmit: (values, { resetForm }) => {
-      let normalizedCard = normalizeCard(values as UnnormalizedCard);
+      const normalizedCard = normalizeCard(values as UnnormalizedCard);
       postNewCard(normalizedCard)
         .then(() => {
           sucessMassage(`Your card post successfuly!`);

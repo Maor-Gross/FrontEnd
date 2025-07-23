@@ -6,9 +6,7 @@ import { useUser } from "../context/UserContext";
 import { useToken } from "../context/TokenContext";
 import { errorMessage } from "../services/feedbackService";
 
-interface CardInfoProps {}
-
-const CardInfo: FunctionComponent<CardInfoProps> = () => {
+const CardInfo: FunctionComponent<object> = () => {
   const { cardId } = useParams();
   const { user } = useUser();
   const { token } = useToken();
