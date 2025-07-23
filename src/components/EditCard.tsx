@@ -6,6 +6,7 @@ import { errorMessage, sucessMassage } from "../services/feedbackService";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToken } from "../context/TokenContext";
 import { Card } from "../interfaces/cards/Cards";
+import { isAxiosError } from "axios";
 
 const EditCard: FunctionComponent<object> = () => {
   const location = useLocation();
@@ -71,8 +72,9 @@ const EditCard: FunctionComponent<object> = () => {
           await updateCardEdited(card._id as string, cardEdited, token);
           sucessMassage(`Your card updated successfully!`);
           navigate("/my-cards");
-        } catch (err: any) {
-          errorMessage(err.response.data);
+        } catch (err) {
+          if (isAxiosError(err)) errorMessage(err.response?.data);
+          else errorMessage("Unknown error occured");
         }
       } else {
         errorMessage("Token is missing.");

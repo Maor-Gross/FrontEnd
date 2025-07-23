@@ -1,8 +1,6 @@
 import { FunctionComponent, useEffect, useState } from "react";
 
-interface DarkModeProps {}
-
-const DarkMode: FunctionComponent<DarkModeProps> = () => {
+const DarkMode: FunctionComponent<object> = () => {
   const [darkMode, setDarkMode] = useState(() => {
     const storedDarkMode = localStorage.getItem("darkMode");
     return storedDarkMode === "true";

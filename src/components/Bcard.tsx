@@ -6,6 +6,7 @@ import { useToken } from "../context/TokenContext";
 import { useNavigate } from "react-router-dom";
 import { errorMessage, sucessMassage } from "../services/feedbackService";
 import logo from "../../images/Bcard-icon.png";
+import { isAxiosError } from "axios";
 
 interface BcardProps {
   card: Card;
@@ -45,9 +46,9 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
           sucessMassage(`Your card delete successfully!`);
 
           updateCards();
-        } catch (error: any) {
-          errorMessage(`Error deleting card:, ${error.response.data}`);
-          console.error("Error deleting card:", error);
+        } catch (err) {
+          if (isAxiosError(err)) errorMessage(err.response?.data);
+          else errorMessage("Unknown error occured");
         }
       } else {
         console.error("Missing user, token, card ID, or bizNumber");

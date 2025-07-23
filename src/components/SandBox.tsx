@@ -1,8 +1,6 @@
 import { FunctionComponent } from "react";
 
-interface SandBoxProps {}
-
-const SandBox: FunctionComponent<SandBoxProps> = () => {
+const SandBox: FunctionComponent<object> = () => {
   return (
     <>
       <h1 className="display-1 text-center">

@@ -1,9 +1,7 @@
 import { FunctionComponent } from "react";
 import bcardLogo from "../../images/Bcard-logo.png";
 
-interface AboutProps {}
-
-const About: FunctionComponent<AboutProps> = () => {
+const About: FunctionComponent<object> = () => {
   return (
     <>
       <div className="about-container text-center mb-5 py-3">
