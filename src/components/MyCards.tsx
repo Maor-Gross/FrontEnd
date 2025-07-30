@@ -19,16 +19,12 @@ const MyCards: FunctionComponent<MyCardsProps> = ({ searchTerm }) => {
 
   const updateCards = useCallback(() => {
     console.log("updateCards called in MyCards component");
-    // ---- שינוי: הוספנו בדיקה מפורשת ל-user ו-user._id ----
     if (user && user._id) {
-      // ודא ש-user קיים וש-user._id קיים
-      const userId = user._id; // כעת userId בטוח הוא string
+      const userId = user._id;
       getAllCards()
         .then((res) => {
           const createdCards = res?.data.filter(
-            (card: Card) =>
-              // ודא ש-card.user_id קיים לפני קריאה ל-includes
-              card.user_id && card.user_id.includes(userId)
+            (card: Card) => card.user_id && card.user_id.includes(userId)
           );
           setMyCards(createdCards);
           setIsLoading(false);
@@ -42,20 +38,18 @@ const MyCards: FunctionComponent<MyCardsProps> = ({ searchTerm }) => {
           setIsLoading(false);
         });
     } else {
-      // אם אין user או user._id, אין כרטיסים להציג והטעינה מסתיימת.
       setMyCards([]);
       setIsLoading(false);
     }
-  }, [user]); // התלות היא ב-user, הפונקציה תשתנה רק אם אובייקט ה-user משתנה
+  }, [user]);
 
   useEffect(() => {
     console.log("MyCards useEffect triggered");
     updateCards();
-  }, [updateCards]); // התלות בפונקציה היציבה updateCards
+  }, [updateCards]);
 
   const filteredMyCards = myCards.filter(
     (card) =>
-      // ודא ש-card.title קיים לפני קריאה ל-toLowerCase
       card.title && card.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -84,7 +78,7 @@ const MyCards: FunctionComponent<MyCardsProps> = ({ searchTerm }) => {
               <h1 className="display-1 ">My cards</h1>
               {filteredMyCards.map((card: Card) => (
                 <Bcard
-                  key={String(card._id)} // אם _id יכול להיות undefined, כדאי לטפל בזה
+                  key={String(card._id)}
                   card={card}
                   updateCards={updateCards}
                 />

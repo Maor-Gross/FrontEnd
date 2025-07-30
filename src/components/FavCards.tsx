@@ -19,17 +19,13 @@ const FavCards: FunctionComponent<FavCardsProps> = ({ searchTerm }) => {
 
   const updateCards = useCallback(() => {
     console.log("updateCards called in FavCards component");
-    // ---- שינוי: הוספנו בדיקה מפורשת ל-user ו-user._id ----
     if (user && user._id) {
-      // ודא ש-user קיים וש-user._id קיים
-      const userId = user._id; // כעת userId בטוח הוא string
+      const userId = user._id;
 
       getAllCards()
         .then((res) => {
           const likedCards = res.data.filter(
-            (card: Card) =>
-              // ודא ש-card.likes קיים לפני קריאה ל-includes
-              card.likes && card.likes.includes(userId)
+            (card: Card) => card.likes && card.likes.includes(userId)
           );
           setFavCards(likedCards);
           setIsLoading(false);
@@ -39,11 +35,10 @@ const FavCards: FunctionComponent<FavCardsProps> = ({ searchTerm }) => {
           setIsLoading(false);
         });
     } else {
-      // אם אין user או user._id, אין כרטיסים מועדפים והטעינה מסתיימת.
       setFavCards([]);
       setIsLoading(false);
     }
-  }, [user]); // התלות היא ב-user
+  }, [user]);
 
   useEffect(() => {
     console.log("FavCards useEffect triggered");
@@ -52,7 +47,6 @@ const FavCards: FunctionComponent<FavCardsProps> = ({ searchTerm }) => {
 
   const filteredFavCards = favCards.filter(
     (card) =>
-      // ודא ש-card.title קיים לפני קריאה ל-toLowerCase
       card.title && card.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

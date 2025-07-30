@@ -9,7 +9,7 @@ import { LoginValues } from "../interfaces/auth/auth";
 
 const Login: FunctionComponent<object> = () => {
   const navigate = useNavigate();
-  const { updateToken } = useToken(); // שימוש ב-useToken
+  const { updateToken } = useToken();
 
   const formik: FormikProps<LoginValues> = useFormik<LoginValues>({
     initialValues: {

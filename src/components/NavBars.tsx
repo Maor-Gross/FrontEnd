@@ -1,4 +1,3 @@
-// src/components/NavBars.tsx
 import { FunctionComponent, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -142,7 +141,7 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
                           className="nav-link active text-light sign-up-text"
                           aria-current="page"
                           to="/register">
-                          Register
+                          Sign Up
                         </Link>
                         <Link
                           className="nav-link active text-light sign-up-icon"
@@ -180,7 +179,7 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
             style={{ cursor: "pointer" }}
             onClick={() => navigate("/about")}>
             <br />
-            אודות
+            About
           </i>
         </div>
         {userLoggedIn && (

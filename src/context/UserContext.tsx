@@ -1,11 +1,10 @@
-// src/context/UserContext.tsx
 import React, {
   createContext,
   useState,
   useContext,
   ReactNode,
   useCallback,
-} from "react"; // הוספנו useCallback
+} from "react";
 import { getUserById } from "../services/userService";
 import { decodeToken } from "../services/tokenService";
 import { User } from "../interfaces/users/User";
@@ -25,7 +24,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
   const [user, setUser] = useState<User | null>(null);
 
-  // ---- שינוי: עטיפת updateUserFromToken ב-useCallback ----
   const updateUserFromToken = useCallback(async (token: string | null) => {
     if (token) {
       try {
@@ -39,7 +37,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     } else {
       setUser(null);
     }
-  }, []); // התלויות של useCallback: מערך ריק אומר שהפונקציה לא תשתנה לעולם.
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser, updateUserFromToken }}>

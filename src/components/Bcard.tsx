@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, useEffect } from "react"; // הוספנו useEffect
+import { FunctionComponent, useState, useEffect } from "react";
 import { Card } from "../interfaces/cards/Cards";
 import { useUser } from "../context/UserContext";
 import { updateCardDeleted, updateCardLikes } from "../services/cardsService";
@@ -16,34 +16,30 @@ interface BcardProps {
 const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
   const { user } = useUser();
   const userLoggedIn = !!user;
-  const isAdmin = user?.isAdmin; // בטוח יותר
+  const isAdmin = user?.isAdmin;
 
-  // השתמש ב-useEffect כדי לסנכרן את liked עם שינויים בכרטיס או במשתמש
-  const [liked, setLiked] = useState(false); // ערך התחלתי מוגדר
+  const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    // עדכן את מצב ה-liked כאשר ה-card או ה-user משתנים
     setLiked(card.likes?.includes(user?._id || "") || false);
-  }, [card.likes, user?._id]); // תלויות: מערך ה-likes של הכרטיס, וה-ID של המשתמש
+  }, [card.likes, user?._id]);
 
   const { token } = useToken();
-  // בדוק אם user קיים ו-user._id קיים לפני השוואה
-  const cardCreator = user && user._id && card?.user_id === user._id; // בטוח יותר
+  const cardCreator = user && user._id && card?.user_id === user._id;
 
   const navigate = useNavigate();
 
   const handleFavoriteClick = async () => {
     if (!user || !token || !card?._id) {
-      // בדיקה מרוכזת וברורה
       console.error("Missing user, token, or card ID for like operation.");
       errorMessage("Must be logged in to like a card."); // הודעה למשתמש
       return;
     }
 
     try {
-      await updateCardLikes(card._id, token); // ודא ש-card._id אינו undefined כבר בבדיקה למעלה
-      setLiked(!liked); // עדכן את ה-state באופן מיידי
-      updateCards(); // קריאה לרענון רשימת הכרטיסים ב-FavCards
+      await updateCardLikes(card._id, token);
+      setLiked(!liked);
+      updateCards();
     } catch (error) {
       if (isAxiosError(error)) {
         errorMessage(error.response?.data?.message || "שגיאה בעדכון לייק");
@@ -55,13 +51,11 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
   };
 
   const handleDeleteClick = async () => {
-    // תיקון שגיאת הקלדה: handel -> handle
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את הכרטיס?")) {
       return;
     }
 
     if (!user || !token || !card?._id || !card?.bizNumber) {
-      // בדיקה מרוכזת וברורה
       console.error(
         "Missing user, token, card ID, or bizNumber for delete operation."
       );
@@ -70,9 +64,9 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
     }
 
     try {
-      await updateCardDeleted(card._id, card.bizNumber, token); // ודא שהם קיימים בבדיקה למעלה
+      await updateCardDeleted(card._id, card.bizNumber, token);
       sucessMassage(`הכרטיס שלך נמחק בהצלחה!`);
-      updateCards(); // קריאה לרענון רשימת הכרטיסים ב-FavCards
+      updateCards();
     } catch (err) {
       if (isAxiosError(err)) {
         errorMessage(err.response?.data?.message || "שגיאה במחיקת הכרטיס.");
@@ -99,7 +93,7 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
         onError={(e) => {
           const target = e.target as HTMLImageElement;
           target.onerror = null;
-          target.src = logo; // תמונה חלופית במקרה של שגיאת טעינה
+          target.src = logo;
         }}
       />
       <div className="card-body" style={{ height: "8rem" }}>
@@ -122,7 +116,7 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
         className="bi bi-info-circle-fill"
         style={{ cursor: "pointer" }}
         onClick={() => navigate(`/card-info/${card._id}`)}>
-        &nbsp; מידע נוסף
+        &nbsp; More Info
       </i>
       <div
         className="card-body d-flex justify-content-between"
@@ -154,8 +148,7 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
             <i
               className="bi bi-trash3-fill text-primary"
               style={{ cursor: "pointer" }}
-              onClick={handleDeleteClick}></i>{" "}
-            {/* תיקון כאן */}
+              onClick={handleDeleteClick}></i>
           </div>
         )}
       </div>

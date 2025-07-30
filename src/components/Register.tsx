@@ -7,8 +7,6 @@ import { registerUser } from "../services/userService";
 import { errorMessage, sucessMassage } from "../services/feedbackService";
 import { useNavigate } from "react-router-dom";
 
-// interface RegisterProps {}
-
 const Register: FunctionComponent<object> = () => {
   const navigate = useNavigate();
   const formik: FormikValues = useFormik<FormikValues>({
