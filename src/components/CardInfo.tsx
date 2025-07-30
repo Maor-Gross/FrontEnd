@@ -82,7 +82,6 @@ const CardInfo: FunctionComponent<object> = () => {
 
               <div className="text-center justify-content-center ">
                 <h1 className="display-5 fw-bold">{Card.title}</h1>
-
                 <h2 className="display-6">{Card.description}</h2>
                 <h2 className="display-6">{Card.subtitle}</h2>
                 {cardId &&
