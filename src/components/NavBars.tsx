@@ -1,6 +1,7 @@
+// src/components/NavBars.tsx
 import { FunctionComponent, useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useToken } from "../context/TokenContext";
 import DarkMode from "./DarkMode";
 import { useCards } from "../context/CardsContext";
@@ -15,31 +16,24 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
   setFilteredCards,
   setSearchTerm,
 }) => {
+  console.log("NavBars rendered");
+
   const navigate = useNavigate();
-  const { clearToken } = useToken();
-  const { token } = useToken();
+  const { clearToken, token } = useToken();
   const { updateUserFromToken, user } = useUser();
   const { cards } = useCards();
 
   useEffect(() => {
+    console.log("NavBars useEffect triggered. Current Token:", token);
     updateUserFromToken(token);
-  }, [token]);
+  }, [token, updateUserFromToken]);
 
-  let userLogin = false;
-  let isBusiness = false;
-  let isAdmin = false;
-
-  if (user) {
-    userLogin = true;
-    if (user.isBusiness) {
-      isBusiness = true;
-    } else if (user.isAdmin) {
-      isAdmin = true;
-    }
-  }
+  const userLoggedIn = !!user;
+  const isBusiness = user?.isBusiness || false;
+  const isAdmin = user?.isAdmin || false;
 
   const handleLogout = () => {
-    const confirmLogout = window.confirm("Are you sure you want to log out?");
+    const confirmLogout = window.confirm("האם אתה בטוח שברצונך להתנתק?");
     if (confirmLogout) {
       clearToken();
       navigate("/");
@@ -65,10 +59,10 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
     <>
       <nav
         className="navbar navbar-expand-lg 
-                    bg-dark 
-                    sticky-top mx-auto
-                    z-1 
-                    rounded-4">
+                           bg-dark 
+                           sticky-top mx-auto
+                           z-1 
+                           rounded-4">
         <div className="container-fluid ">
           <a
             className="navbar-brand text-light fw-bold"
@@ -93,14 +87,14 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
                 aria-current="page"
                 onClick={() => navigate("/about")}
                 style={{ cursor: "pointer" }}>
-                ABOUT
+                About
               </li>
-              {userLogin && (
+              {userLoggedIn && (
                 <li
                   className="nav-item nav-link text-light"
                   onClick={() => navigate("/fav-cards")}
                   style={{ cursor: "pointer" }}>
-                  FAV CARDS
+                  Fav Cards
                 </li>
               )}
               {(isBusiness || isAdmin) && (
@@ -108,7 +102,7 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
                   className="nav-item nav-link text-light"
                   onClick={() => navigate("/my-cards")}
                   style={{ cursor: "pointer" }}>
-                  MY CARDS
+                  My Cards
                 </li>
               )}
               {isAdmin && (
@@ -116,7 +110,7 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
                   className="nav-item nav-link text-light"
                   onClick={() => navigate("/sand-box")}
                   style={{ cursor: "pointer" }}>
-                  SANDBOX
+                  San Box
                 </li>
               )}
             </ul>
@@ -125,14 +119,14 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
                 <input
                   className="form-control me-2"
                   type="search"
-                  placeholder="Search"
+                  placeholder="חיפוש"
                   aria-label="Search"
                   onInput={search}
                 />
               </form>
               <div className="user-actions">
                 <DarkMode />
-                {userLogin ? (
+                {userLoggedIn ? (
                   <img
                     src={user?.image?.url}
                     alt={user?.image?.alt}
@@ -144,32 +138,32 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
                   <div>
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0 sign-up-login">
                       <li className="nav-item">
-                        <a
+                        <Link
                           className="nav-link active text-light sign-up-text"
                           aria-current="page"
-                          href="/register">
-                          SIGN UP
-                        </a>
-                        <a
+                          to="/register">
+                          Register
+                        </Link>
+                        <Link
                           className="nav-link active text-light sign-up-icon"
                           aria-current="page"
-                          href="/register">
+                          to="/register">
                           <i className="bi bi-person-fill-add"></i>
-                        </a>
+                        </Link>
                       </li>
                       <li className="nav-item">
-                        <a
+                        <Link
                           className="nav-link active text-light login-text"
                           aria-current="page"
-                          href="/login">
-                          LOGIN
-                        </a>
-                        <a
+                          to="/login">
+                          Login
+                        </Link>
+                        <Link
                           className="nav-link active text-light login-icon"
                           aria-current="page"
-                          href="/login">
+                          to="/login">
                           <i className="bi bi-box-arrow-in-right "></i>
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </div>
@@ -186,17 +180,17 @@ const NavBars: FunctionComponent<NavBarsProps> = ({
             style={{ cursor: "pointer" }}
             onClick={() => navigate("/about")}>
             <br />
-            About
+            אודות
           </i>
         </div>
-        {userLogin && (
+        {userLoggedIn && (
           <div>
             <i
               className="bi bi-heart-fill text-danger"
               style={{ cursor: "pointer" }}
               onClick={() => navigate("/fav-cards")}>
               <br />
-              Favorites
+              Fav Cards
             </i>
           </div>
         )}

@@ -18,7 +18,7 @@ const CardInfo: FunctionComponent<object> = () => {
       getCardById(cardId)
         .then((res) => {
           setCard(res.data);
-          setLiked(res.data.likes?.includes(user._id) || false);
+          setLiked(res.data.likes?.includes(user?._id) || false);
         })
         .catch((err) => {
           errorMessage(err.response.data);

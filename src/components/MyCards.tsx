@@ -1,4 +1,5 @@
-import { FunctionComponent, useEffect, useState } from "react";
+// src/components/MyCards.tsx
+import { FunctionComponent, useEffect, useState, useCallback } from "react";
 import { Card } from "../interfaces/cards/Cards";
 import { getAllCards } from "../services/cardsService";
 import { useUser } from "../context/UserContext";
@@ -10,16 +11,24 @@ interface MyCardsProps {
 }
 
 const MyCards: FunctionComponent<MyCardsProps> = ({ searchTerm }) => {
+  console.log("MyCards component rendered");
+
   const { user } = useUser();
   const [myCards, setMyCards] = useState<Card[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const updateCards = () => {
-    if (user) {
+  const updateCards = useCallback(() => {
+    console.log("updateCards called in MyCards component");
+    // ---- שינוי: הוספנו בדיקה מפורשת ל-user ו-user._id ----
+    if (user && user._id) {
+      // ודא ש-user קיים וש-user._id קיים
+      const userId = user._id; // כעת userId בטוח הוא string
       getAllCards()
         .then((res) => {
-          const createdCards = res?.data.filter((card: Card) =>
-            card.user_id?.includes(user._id)
+          const createdCards = res?.data.filter(
+            (card: Card) =>
+              // ודא ש-card.user_id קיים לפני קריאה ל-includes
+              card.user_id && card.user_id.includes(userId)
           );
           setMyCards(createdCards);
           setIsLoading(false);
@@ -30,16 +39,24 @@ const MyCards: FunctionComponent<MyCardsProps> = ({ searchTerm }) => {
           } else {
             errorMessage("An unexpected error occurred.");
           }
+          setIsLoading(false);
         });
+    } else {
+      // אם אין user או user._id, אין כרטיסים להציג והטעינה מסתיימת.
+      setMyCards([]);
+      setIsLoading(false);
     }
-  };
+  }, [user]); // התלות היא ב-user, הפונקציה תשתנה רק אם אובייקט ה-user משתנה
 
   useEffect(() => {
+    console.log("MyCards useEffect triggered");
     updateCards();
-  }, [user]);
+  }, [updateCards]); // התלות בפונקציה היציבה updateCards
 
-  const filteredMyCards = myCards.filter((card) =>
-    card.title?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMyCards = myCards.filter(
+    (card) =>
+      // ודא ש-card.title קיים לפני קריאה ל-toLowerCase
+      card.title && card.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
@@ -67,7 +84,7 @@ const MyCards: FunctionComponent<MyCardsProps> = ({ searchTerm }) => {
               <h1 className="display-1 ">My cards</h1>
               {filteredMyCards.map((card: Card) => (
                 <Bcard
-                  key={String(card._id)}
+                  key={String(card._id)} // אם _id יכול להיות undefined, כדאי לטפל בזה
                   card={card}
                   updateCards={updateCards}
                 />

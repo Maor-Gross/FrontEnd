@@ -1,4 +1,5 @@
-import { FunctionComponent, useEffect, useState } from "react";
+// src/components/Cards.tsx
+import { FunctionComponent, useEffect, useState, useCallback } from "react"; // הוספנו useCallback
 import { Card } from "../interfaces/cards/Cards";
 import { getAllCards } from "../services/cardsService";
 import Bcard from "./Bcard";
@@ -13,11 +14,17 @@ const Cards: FunctionComponent<CardsProps> = ({
   filteredCards,
   searchTerm,
 }) => {
+  // ---- שינוי: הוספת console.log לבדיקת רינדור ----
+  console.log("Cards component rendered");
+
   const { cards, setCards } = useCards();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // ---- שינוי: עוטפים את updateCards ב-useCallback ----
+  const updateCards = useCallback(() => {
+    // ---- שינוי: הוספת console.log לבדיקת הפעלת updateCards ----
+    console.log("updateCards called in Cards component");
     getAllCards()
       .then((res) => {
         if (res && res?.data) {
@@ -25,24 +32,20 @@ const Cards: FunctionComponent<CardsProps> = ({
         } else {
           setError("Failed to load cards. Please try again.");
         }
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load cards. Please try again.");
-        setIsLoading(false);
-      });
-  }, []);
-
-  const updateCards = () => {
-    getAllCards()
-      .then((res) => {
-        setCards(res?.data);
+        setIsLoading(false); // יש לוודא ש-setIsLoading מופעל גם במקרה של הצלחה
       })
       .catch((err) => {
         console.error(err);
         setError("Failed to load cards. Please try again.");
+        setIsLoading(false); // יש לוודא ש-setIsLoading מופעל גם במקרה של שגיאה
       });
-  };
+  }, [setCards]); // תלות: setCards הוא פונקציה יציבה מ-useState, לכן היא לא תגרום ללולאה
+
+  useEffect(() => {
+    // ---- שינוי: הוספת console.log לבדיקת הפעלת useEffect ----
+    console.log("Cards useEffect triggered");
+    updateCards(); // נקרא ל-updateCards היציבה
+  }, [updateCards]); // תלות: הפונקציה updateCards שנעטפה ב-useCallback
 
   if (isLoading) {
     return (

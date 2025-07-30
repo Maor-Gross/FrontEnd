@@ -1,7 +1,7 @@
+// src/context/TokenContext.tsx
 import React, { createContext, useState, useContext } from "react";
 
 export interface TokenContextType {
-  // הוספנו export
   token: string | null;
   updateToken: (newToken: string) => void;
   clearToken: () => void;
@@ -12,9 +12,12 @@ const TokenContext = createContext<TokenContextType | null>(null);
 export const TokenProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [token, setToken] = useState<string | null>(
-    sessionStorage.getItem("token")
-  );
+  // ---- שינוי: הוספת console.log כדי לראות אם הקומפוננטה מרנדרת ----
+  console.log("TokenProvider rendered");
+
+  const [token, setToken] = useState<string | null>(() => {
+    return sessionStorage.getItem("token");
+  });
 
   const updateToken = (newToken: string) => {
     sessionStorage.setItem("token", newToken);
@@ -41,4 +44,5 @@ export const useToken = () => {
   return context;
 };
 
-export default TokenContext;
+// ניתן להסיר שורה זו אם לא משתמשים בייצוא ברירת מחדל של הקונטקסט עצמו
+// export default TokenContext;

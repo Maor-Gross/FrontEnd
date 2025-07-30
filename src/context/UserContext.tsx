@@ -1,28 +1,35 @@
-import React, { createContext, useState, useContext } from "react";
+// src/context/UserContext.tsx
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useCallback,
+} from "react"; // הוספנו useCallback
 import { getUserById } from "../services/userService";
 import { decodeToken } from "../services/tokenService";
+import { User } from "../interfaces/users/User";
 
 interface UserContextType {
-  user: any;
-  setUser: (user: any | null) => void;
-  updateUserFromToken: (token: string | null) => Promise<void>; // הוספנו את updateUserFromToken
+  user: User | null;
+  setUser: (user: User | null) => void;
+  updateUserFromToken: (token: string | null) => Promise<void>;
 }
 
-const UserContext = createContext<UserContextType>({
-  user: null,
-  setUser: () => {},
-  updateUserFromToken: async () => {}, // הוספנו את updateUserFromToken
-});
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
+export const UserProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<any>(null);
+  console.log("UserProvider rendered");
 
-  const updateUserFromToken = async (token: string | null) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  // ---- שינוי: עטיפת updateUserFromToken ב-useCallback ----
+  const updateUserFromToken = useCallback(async (token: string | null) => {
     if (token) {
       try {
-        const decodedToken: any = decodeToken(token);
+        const decodedToken = decodeToken(token) as { _id: string };
         const userData = await getUserById(decodedToken._id);
         setUser(userData.data);
       } catch (error) {
@@ -32,7 +39,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       setUser(null);
     }
-  };
+  }, []); // התלויות של useCallback: מערך ריק אומר שהפונקציה לא תשתנה לעולם.
 
   return (
     <UserContext.Provider value={{ user, setUser, updateUserFromToken }}>
@@ -41,7 +48,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useUser = () => {
+export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   if (!context) {
     throw new Error("useUser must be used within a UserProvider");

@@ -3,6 +3,7 @@ import { UserImage } from "./UserImage";
 import { UserName } from "./UserName";
 
 export interface User {
+  _id?: string;
   name: UserName;
   phone: string;
   email: string;
@@ -10,4 +11,5 @@ export interface User {
   image: UserImage;
   address: UserAddress;
   isBusiness: boolean;
+  isAdmin?: boolean;
 }

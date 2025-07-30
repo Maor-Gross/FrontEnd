@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useState, useEffect } from "react"; // הוספנו useEffect
 import { Card } from "../interfaces/cards/Cards";
 import { useUser } from "../context/UserContext";
 import { updateCardDeleted, updateCardLikes } from "../services/cardsService";
@@ -16,45 +16,73 @@ interface BcardProps {
 const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
   const { user } = useUser();
   const userLoggedIn = !!user;
-  const isAdmin = user && user.isAdmin;
-  const [liked, setLiked] = useState(card.likes?.includes(user?._id) || false);
+  const isAdmin = user?.isAdmin; // בטוח יותר
+
+  // השתמש ב-useEffect כדי לסנכרן את liked עם שינויים בכרטיס או במשתמש
+  const [liked, setLiked] = useState(false); // ערך התחלתי מוגדר
+
+  useEffect(() => {
+    // עדכן את מצב ה-liked כאשר ה-card או ה-user משתנים
+    setLiked(card.likes?.includes(user?._id || "") || false);
+  }, [card.likes, user?._id]); // תלויות: מערך ה-likes של הכרטיס, וה-ID של המשתמש
+
   const { token } = useToken();
-  const cardCreator = card?.user_id === user?._id ? true : false;
+  // בדוק אם user קיים ו-user._id קיים לפני השוואה
+  const cardCreator = user && user._id && card?.user_id === user._id; // בטוח יותר
+
   const navigate = useNavigate();
 
   const handleFavoriteClick = async () => {
-    if (user && token) {
-      try {
-        if (card._id) {
-          await updateCardLikes(card?._id, token);
-          setLiked(!liked);
-          updateCards();
-        } else {
-          console.error("Card ID is undefined.");
-        }
-      } catch (error) {
-        console.error("Error updating likes:", error);
-      }
+    if (!user || !token || !card?._id) {
+      // בדיקה מרוכזת וברורה
+      console.error("Missing user, token, or card ID for like operation.");
+      errorMessage("Must be logged in to like a card."); // הודעה למשתמש
+      return;
     }
-  };
 
-  const handelDeleteClick = async () => {
-    if (window.confirm("Are you sure you want to delete the card?")) {
-      if (user && token && card?._id && card?.bizNumber) {
-        try {
-          await updateCardDeleted(card?._id, card?.bizNumber, token);
-          sucessMassage(`Your card delete successfully!`);
-
-          updateCards();
-        } catch (err) {
-          if (isAxiosError(err)) errorMessage(err.response?.data);
-          else errorMessage("Unknown error occured");
-        }
+    try {
+      await updateCardLikes(card._id, token); // ודא ש-card._id אינו undefined כבר בבדיקה למעלה
+      setLiked(!liked); // עדכן את ה-state באופן מיידי
+      updateCards(); // קריאה לרענון רשימת הכרטיסים ב-FavCards
+    } catch (error) {
+      if (isAxiosError(error)) {
+        errorMessage(error.response?.data?.message || "שגיאה בעדכון לייק");
       } else {
-        console.error("Missing user, token, card ID, or bizNumber");
+        errorMessage("משהו השתבש בעדכון לייק");
       }
+      console.error("Error updating likes:", error);
     }
   };
+
+  const handleDeleteClick = async () => {
+    // תיקון שגיאת הקלדה: handel -> handle
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק את הכרטיס?")) {
+      return;
+    }
+
+    if (!user || !token || !card?._id || !card?.bizNumber) {
+      // בדיקה מרוכזת וברורה
+      console.error(
+        "Missing user, token, card ID, or bizNumber for delete operation."
+      );
+      errorMessage("שגיאה במחיקת הכרטיס: חסרים פרטים.");
+      return;
+    }
+
+    try {
+      await updateCardDeleted(card._id, card.bizNumber, token); // ודא שהם קיימים בבדיקה למעלה
+      sucessMassage(`הכרטיס שלך נמחק בהצלחה!`);
+      updateCards(); // קריאה לרענון רשימת הכרטיסים ב-FavCards
+    } catch (err) {
+      if (isAxiosError(err)) {
+        errorMessage(err.response?.data?.message || "שגיאה במחיקת הכרטיס.");
+      } else {
+        errorMessage("משהו השתבש במהלך מחיקת הכרטיס");
+      }
+      console.error("Error deleting card:", err);
+    }
+  };
+
   const handleEditClick = () => {
     navigate("/edit-card", { state: { card } });
   };
@@ -71,7 +99,7 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
         onError={(e) => {
           const target = e.target as HTMLImageElement;
           target.onerror = null;
-          target.src = logo;
+          target.src = logo; // תמונה חלופית במקרה של שגיאת טעינה
         }}
       />
       <div className="card-body" style={{ height: "8rem" }}>
@@ -80,13 +108,13 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
       </div>
       <ul className="list-group list-group-flush" style={{ height: "10rem" }}>
         <li className="list-group-item">
-          <span>Phone: </span>
+          <span>טלפון: </span>
           <span>{card.phone}</span>
           <br />
-          <span>Adress: </span>
+          <span>כתובת: </span>
           <span>{`${card.address.street} ${card.address.houseNumber}, ${card.address.city}`}</span>
           <br />
-          <span>Card Number: </span>
+          <span>מספר כרטיס: </span>
           <span>{card.bizNumber}</span> <br />
         </li>
       </ul>
@@ -94,7 +122,7 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
         className="bi bi-info-circle-fill"
         style={{ cursor: "pointer" }}
         onClick={() => navigate(`/card-info/${card._id}`)}>
-        &nbsp; More info
+        &nbsp; מידע נוסף
       </i>
       <div
         className="card-body d-flex justify-content-between"
@@ -126,7 +154,8 @@ const Bcard: FunctionComponent<BcardProps> = ({ card, updateCards }) => {
             <i
               className="bi bi-trash3-fill text-primary"
               style={{ cursor: "pointer" }}
-              onClick={handelDeleteClick}></i>
+              onClick={handleDeleteClick}></i>{" "}
+            {/* תיקון כאן */}
           </div>
         )}
       </div>

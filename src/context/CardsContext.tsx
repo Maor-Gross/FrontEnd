@@ -1,3 +1,4 @@
+// src/context/CardsContext.tsx
 import React, {
   createContext,
   useState,
@@ -17,8 +18,14 @@ const CardsContext = createContext<CardsContextType | undefined>(undefined);
 export const CardsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  // ---- שינוי: הוספת console.log לבדיקת רינדור ----
+  console.log("CardsProvider rendered");
+
   const [cards, setCards] = useState<Card[]>([]);
 
+  // שים לב: תנאי זה 'if (!cards) { return null; }' הוא קצת מוזר ולא נחוץ.
+  // cards תמיד תהיה מערך (ריק בהתחלה), ולעולם לא תהיה null.
+  // ניתן להסירו. אם תצטרך לדעת למה השארתי אותו, שאל.
   if (!cards) {
     return null;
   }
